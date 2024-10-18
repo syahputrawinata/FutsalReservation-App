@@ -8,7 +8,7 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
     @if (session('failed'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+    <div class="alert alert-danger">{{ session('failed') }}</div>
     @endif
 
     <form action="{{ route('reservations.update', $reservation->id) }}" method="POST">
@@ -23,7 +23,7 @@
         <div class="mb-3">
             <label for="field_id" class="form-label">Nama Lapangan</label>
             <select name="field_id" id="field_id" class="form-select" required>
-                <option value="">Pilih Lapangan</option>
+                <!-- <option value="">Pilih Lapangan</option> -->
                 @foreach($fields as $field)
                     <option value="{{ $field->id }}" {{ $field->id == $reservation->field_id ? 'selected' : '' }}>{{ $field->name }}</option>
                 @endforeach

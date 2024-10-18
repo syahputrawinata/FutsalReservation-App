@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
 use App\Models\Field;
+use Illuminate\Support\Facades\Log;
 
 class ReservationController extends Controller
 {
@@ -85,42 +86,49 @@ public function edit($id)
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Reservation $reservation)
+    public function update(Request $request, $id)
     {
-        // Validasi Input
+        // Temukan reservasi berdasarkan ID
+        $reservation = Reservation::findOrFail($id);
         
-        $request->validate([
-            'customer_name' => 'required|string|max:255', // menambahkan max length
+        // Validasi Input
+        $validatedData = $request->validate([
+            'customer_name' => 'required|string|max:255',
             'field_id' => 'required|exists:fields,id',
             'reservation_date' => 'required|date',
-            'start_time' => 'required|date_format:H:i', // memastikan format waktu benar
-            'end_time' => 'required|date_format:H:i|after:start_time', // memastikan format dan urutan waktu
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
         ]);
-    
+        
         // Cek apakah ada booking yang bentrok
-        $conflict = Reservation::where('field_id', $request->field_id)
-                    ->where('reservation_date', $request->reservation_date)
-                    ->where(function($query) use ($request) {
-                        // Memeriksa apakah ada waktu yang tumpang tindih
-                        $query->whereBetween('start_time', [$request->start_time, $request->end_time])
-                              ->orWhereBetween('end_time', [$request->start_time, $request->end_time])
-                              ->orWhere(function($query) use ($request) {
-                                  $query->where('start_time', '<=', $request->start_time)
-                                        ->where('end_time', '>=', $request->end_time);
-                              });
-                    })->exists();
-    
+        $conflict = Reservation::where('field_id', $validatedData['field_id'])
+            ->where('reservation_date', $validatedData['reservation_date'])
+            ->where(function($query) use ($validatedData) {
+                $query->whereBetween('start_time', [$validatedData['start_time'], $validatedData['end_time']])
+                      ->orWhereBetween('end_time', [$validatedData['start_time'], $validatedData['end_time']])
+                      ->orWhere(function($query) use ($validatedData) {
+                          $query->where('start_time', '<=', $validatedData['start_time'])
+                                ->where('end_time', '>=', $validatedData['end_time']);
+                      });
+            })->exists();
+        
         // Jika ada bentrok
         if ($conflict) {
             return redirect()->route('reservations.edit', $reservation->id)
                              ->with('failed', 'Booking gagal, Lapangan sudah dipesan!');
         }
-    
+
         // Simpan perubahan booking jika tidak ada bentrok
-        $reservation->update($request->only(['customer_name', 'field_id', 'reservation_date', 'start_time', 'end_time']));
-    
+        $reservation->customer_name = $validatedData['customer_name'];
+        $reservation->field_id = $validatedData['field_id'];
+        $reservation->reservation_date = $validatedData['reservation_date'];
+        $reservation->start_time = $validatedData['start_time'];
+        $reservation->end_time = $validatedData['end_time'];
+        $reservation->save(); // Menyimpan perubahan
+
         // Redirect dengan pesan sukses
-        return redirect()->route('reservations.edit', $reservation->id)->with('success', 'Booking berhasil!');
+        return redirect()->route('reservations.edit', $reservation->id)
+                         ->with('success', 'Booking Berhasil Diperbarui!');
     }
     
 
