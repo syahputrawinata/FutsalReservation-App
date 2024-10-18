@@ -115,7 +115,7 @@ public function edit($id)
         // Jika ada bentrok
         if ($conflict) {
             return redirect()->route('reservations.edit', $reservation->id)
-                             ->with('failed', 'Booking gagal, Lapangan sudah dipesan!');
+                             ->with('fail', 'Booking gagal, Lapangan sudah dipesan!');
         }
 
         // Simpan perubahan booking jika tidak ada bentrok

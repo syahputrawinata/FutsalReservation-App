@@ -66,7 +66,7 @@
                     <a class="nav-link" href="#">Teams</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Kelola Akun</a>
+                    <a class="nav-link" href="/user">Kelola Akun</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Players</a>

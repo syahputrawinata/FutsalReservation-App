@@ -7,8 +7,8 @@
     @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
-    @if (session('failed'))
-    <div class="alert alert-danger">{{ session('failed') }}</div>
+    @if (session('fail'))
+    <div class="alert alert-danger">{{ session('fail') }}</div>
     @endif
 
     <form action="{{ route('reservations.update', $reservation->id) }}" method="POST">
