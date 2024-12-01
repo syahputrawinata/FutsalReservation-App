@@ -4,11 +4,19 @@ use Illuminate\Support\Facades\Route;
 // use: import file : namespace\namaclass\
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\KalenderController;
 use App\Models\Reservation;
 
 Route::get('/', function () {
+    return view('auth.login');
+})->name('login');
+
+Route::post('/login', [UserController::class, 'loginAuth'])->name('login.auth');
+Route::get('/logout', [UserController::class, 'logout'])->name('logout');
+
+Route::get('/landing-page', function () {
     return view('landing-page');
-})->name('home');
+})->name('landing-page');
 
 Route::get('/user', function () {
     return view('user.index');
@@ -32,4 +40,8 @@ Route::prefix('/user')->name('user.')->group(function(){
     Route::patch('/{id}', [UserController::class, 'update'])->name('update');
     Route::delete('/{id}', [UserController::class, 'destroy'])->name('delete');
 });
+
+// Route::get('/calendar', [KalenderController::class, 'index'])->name('calendar');
+// Route::get('/landing-page', [KalenderController::class, 'show'])->name('landing.page');
+
 
